@@ -1,7 +1,16 @@
+import { type VariantProps, tv } from "tailwind-variants";
+
+
+export const inputSingleFileVariants = tv({
+  base: `
+    flex flex-col items-center justify-center w-full
+  `
+})
+
 export default function InputSingleFile() {
   return (
     <div>
-      <div>
+      <div className="w-full relative group cursor-pointer">
         <input
           type="file"
           className={`
@@ -9,6 +18,9 @@ export default function InputSingleFile() {
                 opacity-0 cursor-pointer
                 `}
         />
+        <div className={inputSingleFileVariants()}>
+
+        </div>
       </div>
     </div>
   );
