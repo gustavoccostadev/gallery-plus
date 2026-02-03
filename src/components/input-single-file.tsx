@@ -1,8 +1,9 @@
 import { type VariantProps, tv } from "tailwind-variants";
 import Icon from "./icon";
-import Text from "./text";
+import Text, { textVariants } from "./text";
 import UploadFileIcon from "../assets/icons/upload-file.svg?react";
 import FileImageIcon from "../assets/icons/image.svg?react";
+import { useWatch } from "react-hook-form";
 
 export const inputSingleFileVariants = tv({
   base: `
@@ -37,11 +38,22 @@ export const inputSingleFileIconVariants = tv({
 interface InputSingleFileProps
   extends
     VariantProps<typeof inputSingleFileVariants>,
-    React.ComponentProps<"input"> {
+    Omit<React.ComponentProps<"input">, "size"> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: any;
   error?: React.ReactNode;
 }
 
-export default function InputSingleFile({ size, error }: InputSingleFileProps) {
+export default function InputSingleFile({
+  form,
+  size,
+  error,
+  ...props
+}: InputSingleFileProps) {
+  const formValues = useWatch({ control: form.control });
+  const name = props.name || "";
+  const formFile: File = React.useMemo(() => formValues[name]?.[0]);
+
   return (
     <div>
       <div className="w-full relative group cursor-pointer">
@@ -51,6 +63,7 @@ export default function InputSingleFile({ size, error }: InputSingleFileProps) {
                 absolute top-0 right-0 w-full h-full
                 opacity-0 cursor-pointer
                 `}
+          {...props}
         />
         <div className={inputSingleFileVariants({ size })}>
           <Icon
@@ -70,8 +83,26 @@ export default function InputSingleFile({ size, error }: InputSingleFileProps) {
         </Text>
       )}
 
-      <div className="flex gap-3 items-center">
-        <Icon svg={FileImageIcon} />
+      <div className="flex gap-3 items-center border border-solid border-border-primary mt-5 p-3 rounded">
+        <Icon svg={FileImageIcon} className="fill-white w-6 h-6" />
+        <div className="flex flex-col">
+          <div className="truncate max-w-80">
+            <Text variant="label-medium" className="text-placeholder">
+              Nome do Arquivo.png
+            </Text>
+          </div>
+          <div className="flex">
+            <button
+              type="button"
+              className={textVariants({
+                variant: "label-small",
+                className: "text-accent-red cursor-pointer hover:underline",
+              })}
+            >
+              Remover
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
